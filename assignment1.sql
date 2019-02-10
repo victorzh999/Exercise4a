@@ -38,12 +38,14 @@ check(6 < (select count(1) from joke group by userID, date(createdDate) order by
 );
 
 create table joke_tag(
+-- joke_tagID int not null auto_increment,
 jokeID int not null,
 tag varchar(50),
 createdDate datetime default current_timestamp(),
 -- createdBy varchar(100) ,
 updatedDate datetime default current_timestamp(),
 -- updatedBy varchar(100) ,
+-- primary key (joke_tagID),
 primary key (jokeID, tag),
 FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
 		ON DELETE NO ACTION  
@@ -67,100 +69,53 @@ check (type in ('friend', 'joke'))
 );
 
 create table joke_review(
-username varchar(20) not null,
+joke_reviewID int not null auto_increment,
+reviewerID int not null,
 jokeID int not null,
+reviewUsername varchar(20) not null,
 score varchar(10) not null check(score in ('excellent', 'good', 'fair', 'poor')),
 remark varchar(1000),
 createdDate datetime default current_timestamp(),
 -- createdBy varchar(100)  ,
 updatedDate datetime default current_timestamp(),
 -- updatedBy varchar(100) ,
-primary key (username, jokeID),
-FOREIGN KEY (username) REFERENCES user(username) 
+primary key (joke_reviewID),
+unique (reviewerID, jokeID),
+FOREIGN KEY (reviewUsername) REFERENCES user(username) 
+		ON DELETE NO ACTION  
+        ON UPDATE CASCADE,
+FOREIGN KEY (reviewerID) REFERENCES user(userID) 
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
 FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
-check(6 < (select count(1) from joke_review group by username, date(createdDate) order by 1 desc limit 1))
+check(6 < (select count(1) from joke_review group by reviewerID, date(createdDate) order by 1 desc limit 1))
 );
- 
--- CREATE VIEW vw_joke_review(
---   username,
---   jokeID,
---   score,
---   remark
--- )
--- AS
--- select 
---   username,
---   jokeID,
---   score,
---   remark
--- from joke_review 
--- where
---   (username = substring_index(user(), '@', 1));
 
--- drop table blacklist;
 create table blacklist(
 userID varchar(20) not null,
 createdDate datetime default current_timestamp(),
 PRIMARY key (userID)
 );
 
-insert into user(
-userName, password, firstName, lastName, email
-)
-values
-('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com')
-,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com')
-,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com')
-,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com')
-,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com')
-,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com')
-,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com')
-,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com')
-,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com')
-,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com')
-;
-
-insert into joke (
-userID, title, description
-)
-values
-(3, 'joke1', 'this is a fancy joke')
-,(3, 'joke2', 'this is a very intereasting joke i heard')
-,(4, 'joke3', 'this is a boring joke i heard')
-,(3, 'joke4', 'this is a very intereasting joke i heard')
-,(4, 'joke5', 'this is a boring joke i heard')
-,(2, 'joke6', 'this is a very intereasting joke i heard')
-,(2, 'joke7', 'this is a boring joke i heard')
-,(2, 'joke8', 'this is a very intereasting joke i heard')
-,(5, 'joke9', 'this is a boring joke i heard')
-,(6, 'joke210', 'this is a very intereasting joke i heard')
-;
-
-insert into sampledb.vw_joke_review(
-username,
-jokeid,
-score,
-remark
-)
-values
-('john2', 3, 'pooor', 'XXX')
-;
+ALTER TABLE user AUTO_INCREMENT = 1;
+ALTER TABLE joke AUTO_INCREMENT = 1;
+ALTER TABLE joke_review AUTO_INCREMENT = 1;
 
 -- sp_check_posts_perDay_joke
 -- drop procedure sp_check_posts_perDay_joke;
 DELIMITER $
 CREATE PROCEDURE sp_check_posts_perDay_joke()
 BEGIN
-    IF (select count(1) from sampledb.joke group by userID, date(current_timestamp()) order by 1 desc limit 1) = 5 THEN
+    IF (select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1) = 5 THEN
         SIGNAL SQLSTATE '45002'
            SET MESSAGE_TEXT = 'check constraint on joke posts per day failed';
     END IF;
 END$
 DELIMITER ;
+
+-- select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc ;
 
 -- joke_before_insert
 -- drop trigger joke_before_insert;
@@ -171,17 +126,6 @@ BEGIN
     CALL sp_check_posts_perDay_joke;
 END$   
 DELIMITER ; 
-
-insert into joke (
-userID, title, description
-)
-values
-(3, 'joke11', 'this is a fancy joke')
-,(3, 'joke12', 'this is a very intereasting joke i heard')
--- ,(3, 'joke13', 'this is a boring joke i heard')
--- ,(3, 'joke14', 'this is a very intereasting joke i heard')
--- ,(3, 'joke15', 'this is a boring joke i heard')
-;
 
 -- sp_check_single_word_joke_tag
 -- drop procedure sp_check_single_word_joke_tag;
@@ -214,17 +158,6 @@ BEGIN
 END$   
 DELIMITER ;
 
-insert into joke_tag(
-jokeID,
-tag
-)
-values
-(1, 'XY')
-;
-
-select *from joke_tag;
--- update joke_tag set tag='Y' where jokeid = 1 and tag = 'X Y';
-
 -- sp_check_type_user_favorite;
 DELIMITER $
 CREATE PROCEDURE `sp_check_type_user_favorite`(IN type varchar(20))
@@ -256,83 +189,170 @@ BEGIN
 END$   
 DELIMITER ;
 
--- show triggers;
-
--- sp_check_score_joke_review
--- drop procedure sp_check_score_joke_review;
+-- CALL sp_before_insert_joke_review(new.score, new.jokeID);
+-- sp_before_insert_joke_review
+-- drop procedure sp_before_insert_joke_review;
 DELIMITER $
-CREATE PROCEDURE `sp_check_score_joke_review`(IN score varchar(10), IN username varchar(20))
+CREATE PROCEDURE `sp_before_insert_joke_review`(IN score varchar(10), IN jokeID int)
 BEGIN
     IF score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
            SET MESSAGE_TEXT = 'check constraint on joke_review.score failed';
     END IF;
     
-    IF username <>  substring_index(user(), '@', 1) THEN
+    IF (select user.username from joke join user on user.userID = joke.userID where joke.jokeID = jokeID) =  substring_index(user(), '@', 1) THEN
 		SIGNAL SQLSTATE '45001'
-			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed';
+			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed. Cannot post review on your own joke';
     END IF;
---     
---     IF price < cost THEN
---  SIGNAL SQLSTATE '45002'
---            SET MESSAGE_TEXT = 'check constraint on parts.price & parts.cost failed';
---     END IF;
-END$
-DELIMITER ;
-
--- drop trigger joke_review_before_insert;
--- drop trigger `joke_review_before_update`;
-DELIMITER $
-CREATE TRIGGER `joke_review_before_insert` BEFORE INSERT ON `joke_review`
-FOR EACH ROW
-BEGIN
-    CALL sp_check_score_joke_review(new.score, new.username);
-END$   
-DELIMITER ; 
--- before update
-DELIMITER $
-CREATE TRIGGER `joke_review_before_update` BEFORE UPDATE ON `joke_review`
-FOR EACH ROW
-BEGIN
-    CALL sp_check_score_joke_review(new.score, new.username);
-END$   
-DELIMITER ;
-
--- sp_check_posts_perDay_review
-DELIMITER $
-CREATE PROCEDURE sp_check_posts_perDay_review()
-BEGIN
-    IF (select count(1) from sampledb.joke_review group by username, date(current_timestamp()) order by 1 desc limit 1) = 5 THEN
+    
+    IF (select count(1) from sampledb.joke_review where date(createdDate) = date(current_timestamp()) and reviewUsername =  substring_index(user(), '@', 1) group by reviewUsername) = 5 THEN
         SIGNAL SQLSTATE '45030'
            SET MESSAGE_TEXT = 'check constraint on review posts per day failed';
     END IF;
 END$
 DELIMITER ;
 
--- joke_review_posts_before_insert
--- drop trigger joke_before_insert;
+-- select user.username from joke join user on user.userID = joke.userID where joke.jokeID = 1;
+-- select * from joke_review;
+-- select *from joke;
+
+-- select count(1) from sampledb.joke_review jr join user on user.userID = jr where date(createdDate) = date(current_timestamp()) and reviewerID =  group by reviewerID order by 1 desc limit 1
+        
+-- select distinct user.username from user join joke on user.userID = joke.userID and joke.jokeID = 6;
+-- select substring_index(user(), '@', 1);
+
+-- drop procedure sp_before_update_joke_review;
 DELIMITER $
-CREATE TRIGGER `joke_review_posts_before_insert` BEFORE INSERT ON `joke_review`
+CREATE PROCEDURE `sp_before_update_joke_review`(IN score varchar(10), IN joke_reviewID int)
+BEGIN
+    IF score not in ('excellent', 'good', 'fair', 'poor') THEN
+        SIGNAL SQLSTATE '45000'
+           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed';
+    END IF;
+    
+    IF (select jr.reviewUsername from joke_review jr where jr.joke_reviewID = joke_reviewID) <>  substring_index(user(), '@', 1) THEN
+		SIGNAL SQLSTATE '45001'
+			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed. Cannot modify other user review';
+    END IF;
+END$
+DELIMITER ;
+
+-- select distinct reviewUsername from joke_review where jokeID = 6 and reviewUsername <>  substring_index(user(), '@', 1);
+-- select distinct user.username from user join joke on user.userID = joke.userID and joke.jokeID = 3;
+
+-- drop trigger joke_review_before_insert;
+-- drop trigger `joke_review_before_update`;
+DELIMITER $
+CREATE TRIGGER joke_review_before_insert BEFORE INSERT ON joke_review
 FOR EACH ROW
 BEGIN
-    CALL sp_check_posts_perDay_review;
+    CALL sp_before_insert_joke_review(new.score, new.jokeID);
 END$   
 DELIMITER ; 
 
+-- before update
+DELIMITER $
+CREATE TRIGGER joke_review_before_update BEFORE UPDATE ON joke_review
+FOR EACH ROW
+BEGIN
+    CALL sp_before_update_joke_review(new.score, new.joke_reviewID);
+END$   
+DELIMITER ;
+
+
+
+
+insert into user(
+userName, password, firstName, lastName, email
+)
+values
+('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com')
+,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com')
+,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com')
+,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com')
+,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com')
+,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com')
+,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com')
+,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com')
+,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com')
+,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com')
+,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com')
+;
+-- select * from user;
+
+insert into joke (
+userID, title, description
+)
+values
+(11, 'joke_vzhang', 'this is a normal joke')
+,(3, 'joke1', 'this is a fancy joke')
+,(3, 'joke2', 'this is a very intereasting joke i heard')
+,(4, 'joke3', 'this is a boring joke i heard')
+,(3, 'joke4', 'this is a very intereasting joke i heard')
+,(4, 'joke5', 'this is a boring joke i heard')
+,(2, 'joke6', 'this is a very intereasting joke i heard')
+,(2, 'joke7', 'this is a boring joke i heard')
+,(2, 'joke8', 'this is a very intereasting joke i heard')
+,(5, 'joke9', 'this is a boring joke i heard')
+,(6, 'joke210', 'this is a very intereasting joke i heard')
+;
+
+insert into joke (
+userID, title, description
+)
+values
+(3, 'joke11', 'this is a fancy joke')
+,(3, 'joke12', 'this is a very intereasting joke i heard')
+-- ,(3, 'joke13', 'this is a boring joke i heard')
+-- ,(3, 'joke14', 'this is a very intereasting joke i heard')
+-- ,(3, 'joke15', 'this is a boring joke i heard')
+;
+
+insert into joke_tag(
+jokeID,
+tag
+)
+values
+(1, 'XYY')
+;
+
 
 insert into sampledb.joke_review(
-username,
+reviewerID,
+reviewUsername,
 jokeid,
 score,
 remark
 )
 values
-('vzhang', 3, 'good', 'XXX')
-,('vzhang', 4, 'good', 'XXX')
-,('vzhang', 5, 'good', 'XXX')
+(2, 'john', 7, 'good', 'XXX')
+,(11, 'vzhang', 3, 'good', 'XXX')
+,(11, 'vzhang', 4, 'good', 'XXX')
 ;
 
-select * from joke_review order by createdDate;
+select * from user;
+select * from joke;
+select * from joke_review;
+
+
+
+
+select count(1) from joke_review where jokeid = 7 and reviewerID = 11;
+
+show triggers;
+
+-- insert into sampledb.joke_review(
+-- reviewerID,
+-- reviewUsername,
+-- jokeid,
+-- score,
+-- remark
+-- )
+-- values
+-- (11, 'vzhang', 1, 'good', 'XXX')
+-- ;
+
+update sampledb.joke_review set score = 'fair' where joke_reviewID = 1;
 
 -- GRANT SELECT, INSERT, UPDATE, DELETE, 
 --   ON TABLE user_books

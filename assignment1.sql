@@ -69,7 +69,7 @@ check (type in ('friend', 'joke'))
 );
 
 create table joke_review(
-joke_reviewID int not null auto_increment,
+-- joke_reviewID int not null auto_increment,
 reviewerID int not null,
 jokeID int not null,
 reviewUsername varchar(20) not null,
@@ -79,8 +79,8 @@ createdDate datetime default current_timestamp(),
 -- createdBy varchar(100)  ,
 updatedDate datetime default current_timestamp(),
 -- updatedBy varchar(100) ,
-primary key (joke_reviewID),
-unique (reviewerID, jokeID),
+primary key (reviewerID, jokeID),
+-- unique (reviewerID, jokeID),
 FOREIGN KEY (reviewUsername) REFERENCES user(username) 
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
@@ -101,7 +101,7 @@ PRIMARY key (userID)
 
 ALTER TABLE user AUTO_INCREMENT = 1;
 ALTER TABLE joke AUTO_INCREMENT = 1;
-ALTER TABLE joke_review AUTO_INCREMENT = 1;
+-- ALTER TABLE joke_review AUTO_INCREMENT = 1;
 
 -- sp_check_posts_perDay_joke
 -- drop procedure sp_check_posts_perDay_joke;
@@ -223,14 +223,14 @@ DELIMITER ;
 
 -- drop procedure sp_before_update_joke_review;
 DELIMITER $
-CREATE PROCEDURE `sp_before_update_joke_review`(IN score varchar(10), IN joke_reviewID int)
+CREATE PROCEDURE `sp_before_update_joke_review`(IN score varchar(10), IN reviewUsername varchar(20))
 BEGIN
     IF score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
            SET MESSAGE_TEXT = 'check constraint on joke_review.score failed';
     END IF;
     
-    IF (select jr.reviewUsername from joke_review jr where jr.joke_reviewID = joke_reviewID) <>  substring_index(user(), '@', 1) THEN
+    IF reviewUsername <>  substring_index(user(), '@', 1) THEN
 		SIGNAL SQLSTATE '45001'
 			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed. Cannot modify other user review';
     END IF;
@@ -255,7 +255,7 @@ DELIMITER $
 CREATE TRIGGER joke_review_before_update BEFORE UPDATE ON joke_review
 FOR EACH ROW
 BEGIN
-    CALL sp_before_update_joke_review(new.score, new.joke_reviewID);
+    CALL sp_before_update_joke_review(new.score, new.reviewUsername);
 END$   
 DELIMITER ;
 
@@ -334,9 +334,6 @@ select * from user;
 select * from joke;
 select * from joke_review;
 
-
-
-
 select count(1) from joke_review where jokeid = 7 and reviewerID = 11;
 
 show triggers;
@@ -352,7 +349,9 @@ show triggers;
 -- (11, 'vzhang', 1, 'good', 'XXX')
 -- ;
 
-update sampledb.joke_review set score = 'fair' where joke_reviewID = 1;
+update sampledb.joke_review set score = 'fair' where reviewerID = 2 and jokeID = 7;
+
+
 
 -- GRANT SELECT, INSERT, UPDATE, DELETE, 
 --   ON TABLE user_books

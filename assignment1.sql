@@ -12,6 +12,7 @@ lastName varchar(50) not null,
 email varchar(100) not null,
 gender varchar(20),
 age int,
+isRoot int default 0,
 createdDate datetime default current_timestamp(),
 -- createdBy varchar(100) default user(),
 updatedDate datetime default current_timestamp(),
@@ -103,20 +104,20 @@ ALTER TABLE user AUTO_INCREMENT = 1;
 ALTER TABLE joke AUTO_INCREMENT = 1;
 
 insert into user(
-userName, password, firstName, lastName, email
+userName, password, firstName, lastName, email, isRoot
 )
 values
-('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com')
-,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com')
-,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com')
-,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com')
-,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com')
-,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com')
-,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com')
-,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com')
-,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com')
-,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com')
-,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com')
+('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com', 1)
+,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com', 0)
+,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com', 0)
+,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com', 0)
+,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com', 0)
+,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com', 0)
+,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com', 0)
+,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com', 0)
+,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com', 0)
+,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com', 0)
+,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com', 0)
 ;
 -- select * from user;
 
@@ -243,7 +244,7 @@ CREATE PROCEDURE sp_check_single_word_joke_tag(IN tag varchar(50))
 BEGIN
     IF tag like '% %' THEN
         SIGNAL SQLSTATE '45010'
-           SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on single word';
+           SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on single word. Tag should be single word.';
     END IF;
 END$
 DELIMITER ;
@@ -273,7 +274,7 @@ CREATE PROCEDURE `sp_check_type_user_favorite`(IN type varchar(20))
 BEGIN
     IF type not in ('friend', 'joke') THEN
         SIGNAL SQLSTATE '45020'
-           SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed';
+           SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
     END IF;
 END$
 DELIMITER ;
@@ -306,7 +307,7 @@ CREATE PROCEDURE `sp_before_insert_joke_review`(IN score varchar(10), IN jokeID 
 BEGIN
     IF score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
-           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed';
+           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
     END IF;
     
     IF (select user.username from joke join user on user.userID = joke.userID where joke.jokeID = jokeID) =  substring_index(user(), '@', 1) THEN
@@ -336,7 +337,7 @@ CREATE PROCEDURE `sp_before_update_joke_review`(IN score varchar(10), IN reviewU
 BEGIN
     IF score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
-           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed';
+           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
     END IF;
     
     IF reviewUsername <>  substring_index(user(), '@', 1) THEN

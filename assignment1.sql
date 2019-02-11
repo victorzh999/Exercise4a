@@ -56,7 +56,7 @@ check (tag not like '% %')
 create table user_favorite(
 userID int not null,
 type varchar(20),
-favorite varchar(50),
+favorite int,
 createdDate datetime default current_timestamp(),
 -- createdBy varchar(100)  ,
 updatedDate datetime default current_timestamp(),
@@ -101,7 +101,116 @@ PRIMARY key (userID)
 
 ALTER TABLE user AUTO_INCREMENT = 1;
 ALTER TABLE joke AUTO_INCREMENT = 1;
--- ALTER TABLE joke_review AUTO_INCREMENT = 1;
+
+insert into user(
+userName, password, firstName, lastName, email
+)
+values
+('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com')
+,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com')
+,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com')
+,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com')
+,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com')
+,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com')
+,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com')
+,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com')
+,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com')
+,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com')
+,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com')
+;
+-- select * from user;
+
+insert into joke (
+userID, title, description
+)
+values
+(11, 'joke_vzhang', 'this is a normal joke')
+,(3, 'joke1', 'this is a fancy joke')
+,(3, 'joke2', 'this is a very intereasting joke i heard')
+,(4, 'joke3', 'this is a boring joke i heard')
+,(3, 'joke4', 'this is a very intereasting joke i heard')
+,(4, 'joke5', 'this is a boring joke i heard')
+,(2, 'joke6', 'this is a very intereasting joke i heard')
+,(2, 'joke7', 'this is a boring joke i heard')
+,(2, 'joke8', 'this is a very intereasting joke i heard')
+,(5, 'joke9', 'this is a boring joke i heard')
+,(6, 'joke210', 'this is a very intereasting joke i heard')
+;
+
+insert into joke (
+userID, title, description
+)
+values
+(3, 'joke11', 'this is a fancy joke')
+,(3, 'joke12', 'this is a very intereasting joke i heard')
+-- ,(3, 'joke13', 'this is a boring joke i heard')
+-- ,(3, 'joke14', 'this is a very intereasting joke i heard')
+-- ,(3, 'joke15', 'this is a boring joke i heard')
+;
+
+insert into joke_tag(
+jokeID,
+tag
+)
+values
+(1, 'XYY'),
+(1, 'X'),
+(1, 'Y'),
+(2, 'X'),
+(2, 'Y'),
+(3, 'X'),
+(3, 'Y'),
+(3, 'XYYY'),
+(3, 'YXY'),
+(4, 'story'),
+(4, 'kids')
+;
+
+
+insert into sampledb.joke_review(
+reviewerID,
+reviewUsername,
+jokeid,
+score,
+remark
+)
+values
+(2, 'john', 7, 'good', 'XXX')
+,(2, 'john', 3, 'good', 'XXX')
+,(2, 'john', 4, 'good', 'XXX')
+,(2, 'john', 5, 'good', 'XXX')
+,(11, 'vzhang', 2, 'good', 'XXX')
+,(11, 'vzhang', 3, 'good', 'XXX')
+,(11, 'vzhang', 4, 'good', 'XXX')
+,(11, 'vzhang', 5, 'good', 'XXX')
+,(11, 'vzhang', 6, 'good', 'XXX')
+,(2, 'john', 2, 'good', 'XXX')
+;
+
+
+INSERT INTO `sampledb`.`user_favorite`
+(`userID`,
+`type`,
+`favorite`)
+VALUES
+(11, 'friend', 2)
+,(11, 'friend', 3)
+,(11, 'friend', 4)
+,(11, 'friend', 5)
+,(11, 'friend', 6)
+,(11, 'joke', 4)
+,(11, 'joke', 5)
+,(11, 'joke', 6)
+,(11, 'joke', 7)
+,(11, 'joke', 8)
+;
+
+INSERT INTO `sampledb`.`blacklist`
+(`userID`)
+VALUES
+(3)
+,(4)
+;
 
 -- sp_check_posts_perDay_joke
 -- drop procedure sp_check_posts_perDay_joke;
@@ -259,98 +368,25 @@ BEGIN
 END$   
 DELIMITER ;
 
+-- show triggers;
+
+-- INSERT INTO `sampledb`.`user_favorite`
+-- (`userID`,
+-- `type`,
+-- `favorite`)
+-- VALUES
+-- (11, 'frid', 3);
 
 
-
-insert into user(
-userName, password, firstName, lastName, email
-)
-values
-('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com')
-,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com')
-,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com')
-,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com')
-,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com')
-,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com')
-,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com')
-,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com')
-,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com')
-,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com')
-,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com')
-;
 -- select * from user;
+-- select * from joke;
+-- select * from joke_review;
 
-insert into joke (
-userID, title, description
-)
-values
-(11, 'joke_vzhang', 'this is a normal joke')
-,(3, 'joke1', 'this is a fancy joke')
-,(3, 'joke2', 'this is a very intereasting joke i heard')
-,(4, 'joke3', 'this is a boring joke i heard')
-,(3, 'joke4', 'this is a very intereasting joke i heard')
-,(4, 'joke5', 'this is a boring joke i heard')
-,(2, 'joke6', 'this is a very intereasting joke i heard')
-,(2, 'joke7', 'this is a boring joke i heard')
-,(2, 'joke8', 'this is a very intereasting joke i heard')
-,(5, 'joke9', 'this is a boring joke i heard')
-,(6, 'joke210', 'this is a very intereasting joke i heard')
-;
-
-insert into joke (
-userID, title, description
-)
-values
-(3, 'joke11', 'this is a fancy joke')
-,(3, 'joke12', 'this is a very intereasting joke i heard')
--- ,(3, 'joke13', 'this is a boring joke i heard')
--- ,(3, 'joke14', 'this is a very intereasting joke i heard')
--- ,(3, 'joke15', 'this is a boring joke i heard')
-;
-
-insert into joke_tag(
-jokeID,
-tag
-)
-values
-(1, 'XYY')
-;
+-- select count(1) from joke_review where jokeid = 7 and reviewerID = 11;
 
 
-insert into sampledb.joke_review(
-reviewerID,
-reviewUsername,
-jokeid,
-score,
-remark
-)
-values
-(2, 'john', 7, 'good', 'XXX')
-,(11, 'vzhang', 3, 'good', 'XXX')
-,(11, 'vzhang', 4, 'good', 'XXX')
-;
 
-select * from user;
-select * from joke;
-select * from joke_review;
-
-select count(1) from joke_review where jokeid = 7 and reviewerID = 11;
-
-show triggers;
-
--- insert into sampledb.joke_review(
--- reviewerID,
--- reviewUsername,
--- jokeid,
--- score,
--- remark
--- )
--- values
--- (11, 'vzhang', 1, 'good', 'XXX')
--- ;
-
-update sampledb.joke_review set score = 'fair' where reviewerID = 2 and jokeID = 7;
-
+-- update sampledb.joke_review set score = 'fair' where reviewerID = 2 and jokeID = 7;
 
 
 -- GRANT SELECT, INSERT, UPDATE, DELETE, 

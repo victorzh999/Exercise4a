@@ -13,18 +13,24 @@
     try{
         String username = request.getParameter("username");   
         String password = request.getParameter("password");
+        
+        HttpSession sess = request.getSession(); 
+        sess.setAttribute("username", username);
+        sess.setAttribute("password", password);
+        
         Class.forName("com.mysql.cj.jdbc.Driver");  // MySQL database connection
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/test?" + "user=root&password=Ilovexue9");    
-        PreparedStatement pst = conn.prepareStatement("Select username,password from login where username=? and password=?");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/sampledb?" + "user=vzhang&password=victor1234");    
+        PreparedStatement pst = conn.prepareStatement("Select username,password from user where username=? and password=?");
         pst.setString(1, username);
         pst.setString(2, password);
         ResultSet rs = pst.executeQuery();                        
         if(rs.next()) {           
             out.println("Valid login credentials"); 
-            request.getRequestDispatcher("BookList.jsp").forward(request, response);
- 
-/*            <form method="post" action="BookList.jsp">
-           </form> */
+//             request.setAttribute("username", username);
+            request.getRequestDispatcher("JokeHomePage.jsp").forward(request, response);
+//          request.setAttribute("listBook", listBook);       
+//          RequestDispatcher dispatcher = request.getRequestDispatcher("JokeHomePage.jsp");       
+//          dispatcher.forward(request, response);
         }
         else
            out.println("Invalid login credentials");            

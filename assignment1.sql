@@ -30,9 +30,11 @@ updatedDate datetime default current_timestamp(),
 primary key (jokeID),
 FOREIGN KEY FK_joke_userID (userID) REFERENCES user(userID)
 		ON DELETE NO ACTION  
-        ON UPDATE CASCADE,
-check( 5 >= (select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1))
+        ON UPDATE CASCADE
+-- , check( 5 >= (select count(1) from joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1))
 ) auto_increment = 1;
+
+
 
 create table joke_tag(
 jokeID int not null,
@@ -77,8 +79,8 @@ FOREIGN KEY (reviewerID) REFERENCES user(userID)
         ON UPDATE CASCADE,
 FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
 		ON DELETE NO ACTION  
-        ON UPDATE CASCADE,
-check(5 >= (select count(1) from sampledb.joke_review where date(createdDate) = date(current_timestamp()) and reviewUsername =  substring_index(user(), '@', 1) group by reviewUsername) = 5)
+        ON UPDATE CASCADE
+-- ,check(5 >= (select count(1) from joke_review where date(createdDate) = date(current_timestamp()) and reviewUsername =  substring_index(user(), '@', 1) group by reviewUsername) = 5)
 );
 
 create table blacklist(

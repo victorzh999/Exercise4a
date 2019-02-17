@@ -18,7 +18,7 @@
         sess.setAttribute("username", username);
         sess.setAttribute("password", password);
         
-        Class.forName("com.mysql.cj.jdbc.Driver");  // MySQL database connection
+        Class.forName("com.mysql.jdbc.Driver");  // MySQL database connection
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/sampledb?" + "user=vzhang&password=victor1234");    
         PreparedStatement pst = conn.prepareStatement("Select username,password from user where username=? and password=?");
         pst.setString(1, username);

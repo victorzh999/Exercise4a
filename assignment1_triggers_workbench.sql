@@ -8,7 +8,8 @@ BEGIN
         SIGNAL SQLSTATE '45002'
            SET MESSAGE_TEXT = 'check constraint on joke posts per day failed';
     END IF;
-END$
+END;
+$
 DELIMITER ;
 
 -- select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc ;

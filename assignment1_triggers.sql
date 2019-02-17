@@ -4,7 +4,7 @@
  	CREATE TRIGGER `joke_before_insert` BEFORE INSERT ON `joke`
  	FOR EACH ROW
  	BEGIN
-     IF (select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1) = 5 THEN
+     IF (select count(1) from joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1) = 5 THEN
          SIGNAL SQLSTATE '45002'
             SET MESSAGE_TEXT = 'check constraint on joke posts per day failed';
      END IF;
@@ -16,12 +16,12 @@
  CREATE TRIGGER `joke_tag_before_insert` BEFORE INSERT ON `joke_tag`
  	FOR EACH ROW
  		BEGIN
-    IF tag like '% %' THEN
+    IF new.tag like '% %' THEN
         SIGNAL SQLSTATE '45010'
            SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on single word. Tag should be single word.';
     END IF;
     
-	IF binary tag <> binary lower(tag) THEN
+	IF binary new.tag <> binary lower(new.tag) THEN
         SIGNAL SQLSTATE '45011'
            SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on lower case. Tag should be lower cases.';
     END IF;
@@ -32,12 +32,12 @@ END;
  CREATE TRIGGER `joke_tag_before_update` BEFORE UPDATE ON `joke_tag`
  	FOR EACH ROW
  	 		BEGIN
-    IF tag like '% %' THEN
+    IF new.tag like '% %' THEN
         SIGNAL SQLSTATE '45010'
            SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on single word. Tag should be single word.';
     END IF;
     
-	IF binary tag <> binary lower(tag) THEN
+	IF binary new.tag <> binary lower(new.tag) THEN
         SIGNAL SQLSTATE '45011'
            SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on lower case. Tag should be lower cases.';
     END IF;
@@ -52,7 +52,7 @@ END;
  CREATE TRIGGER `user_favorite_before_insert` BEFORE INSERT ON `user_favorite`
  	FOR EACH ROW
  	BEGIN
-	 	    IF type not in ('friend', 'joke') THEN
+	 	    IF new.type not in ('friend', 'joke') THEN
         SIGNAL SQLSTATE '45020'
            SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
     END IF;
@@ -62,7 +62,7 @@ END;
  CREATE TRIGGER `user_favorite_before_update` BEFORE UPDATE ON `user_favorite`
  	FOR EACH ROW
  	BEGIN
-	 	    IF type not in ('friend', 'joke') THEN
+	 	    IF new.type not in ('friend', 'joke') THEN
         SIGNAL SQLSTATE '45020'
            SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
     END IF;
@@ -75,7 +75,7 @@ END;
  CREATE TRIGGER joke_review_before_insert BEFORE INSERT ON joke_review
  	FOR EACH ROW
  	BEGIN
-	 	    IF score not in ('excellent', 'good', 'fair', 'poor') THEN
+	 	    IF new.score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
            SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
     END IF;
@@ -96,12 +96,12 @@ END;
  CREATE TRIGGER joke_review_before_update BEFORE UPDATE ON joke_review
  	FOR EACH ROW
  	BEGIN
-	 	    IF score not in ('excellent', 'good', 'fair', 'poor') THEN
+	 	    IF new.score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
            SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
     END IF;
     
-    IF reviewUsername <>  substring_index(user(), '@', 1) THEN
+    IF new.reviewUsername <>  substring_index(user(), '@', 1) THEN
 		SIGNAL SQLSTATE '45001'
 			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed. Cannot modify other user review';
     END IF;

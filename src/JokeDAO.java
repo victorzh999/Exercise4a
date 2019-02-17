@@ -181,7 +181,8 @@ public class JokeDAO extends HttpServlet{
 		ResultSet resultSetQuery = null;
 		Statement statement = null;
 		String sql1 = " ";
-		
+	
+//		create database and tables
 		String fileName = "/Users/vzhang/eclipse-workspace/Exercise4a/assignment1.sql";
 		List<String> lines = Files.lines(Paths.get(fileName)).collect(Collectors.toList());
 
@@ -199,7 +200,6 @@ public class JokeDAO extends HttpServlet{
 			}
 		}
 		
-
 // create database and table			
 		for (String sql: sqls) {
 			sql = sql.trim();
@@ -245,8 +245,9 @@ public class JokeDAO extends HttpServlet{
 			sqlStatement = sql;
 			statement = jdbcConnection.createStatement();
 			resultSet1 = statement.execute(sqlStatement);	
-
 		}
+
+		System.out.println("triggers are created!");
 
 //		statement.close();
 //		resultSetQuery.close();

@@ -216,52 +216,52 @@ public class JokeDAO extends HttpServlet{
 		}
 		
 		// create triggers and procedures
-		fileName = "/Users/vzhang/eclipse-workspace/Exercise4a/assignment1_triggers.sql";
-		lines = Files.lines(Paths.get(fileName)).collect(Collectors.toList());
-
-		boolean resultSet1 = false;
+//		fileName = "/Users/vzhang/eclipse-workspace/Exercise4a/assignment1_triggers.sql";
+//		lines = Files.lines(Paths.get(fileName)).collect(Collectors.toList());
+//
+//		boolean resultSet1 = false;
+//		
+//		sql1 = " ";
+//		sqls = new ArrayList<>();
+//		for (int i = 0; i < lines.size(); i++){
+//			if (lines.get(i).startsWith("--")){
+//				continue;
+//			}
+//			else if (lines.get(i).contains("END;")) {
+//				sqls.add(sql1 + lines.get(i));
+//				sql1 = " ";
+//			}
+//			else {
+//				sql1  += lines.get(i);
+//			}
+//		}
+//			
+//		for (String sql: sqls) {
+//			sql = sql.trim();
+//
+//			sqlStatement = sql;
+//			statement = jdbcConnection.createStatement();
+//			resultSet1 = statement.execute(sqlStatement);			
+//		}
 		
-		sql1 = " ";
-		sqls = new ArrayList<>();
-		for (int i = 0; i < lines.size(); i++){
-			if (lines.get(i).startsWith("--")){
-				continue;
-			}
-			else if (lines.get(i).contains("END;")) {
-				sqls.add(sql1 + lines.get(i));
-				sql1 = " ";
-			}
-			else {
-				sql1  += lines.get(i);
-			}
-		}
-			
-		for (String sql: sqls) {
-			sql = sql.trim();
-
-			sqlStatement = sql;
-			statement = jdbcConnection.createStatement();
-			resultSet1 = statement.execute(sqlStatement);			
-		}
-		
-		statement = jdbcConnection.createStatement();
-//		boolean resultSet1 = statement.execute(sqlStatement);
-		sqlStatement = "CREATE TRIGGER joke_before_insert BEFORE INSERT ON joke " + 
-				"	FOR EACH ROW " + 
-				"	BEGIN " + 
-				"    IF (select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1) = 5 THEN " + 
-				"        SIGNAL SQLSTATE '45002'  " + 
-				"           SET MESSAGE_TEXT = 'check constraint on joke posts per day failed'; " + 
-				"    END IF; " + 
-				"	END;";
-		statement = jdbcConnection.createStatement();
-		resultSet1 = statement.execute("CREATE TRIGGER obs_update BEFORE INSERT ON sampledb.joke " //
-		        + "FOR EACH ROW "//
-		        + "BEGIN "//
-		        + "IF joke.jokeID = 1 THEN "//
-		        + "   DELETE FROM joke WHERE jokeID = 1; "//
-		        + "END IF; "//
-		        + "END;");
+//		statement = jdbcConnection.createStatement();
+////		boolean resultSet1 = statement.execute(sqlStatement);
+//		sqlStatement = "CREATE TRIGGER joke_before_insert BEFORE INSERT ON joke " + 
+//				"	FOR EACH ROW " + 
+//				"	BEGIN " + 
+//				"    IF (select count(1) from sampledb.joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1) = 5 THEN " + 
+//				"        SIGNAL SQLSTATE '45002'  " + 
+//				"           SET MESSAGE_TEXT = 'check constraint on joke posts per day failed'; " + 
+//				"    END IF; " + 
+//				"	END;";
+//		statement = jdbcConnection.createStatement();
+//		resultSet1 = statement.execute("CREATE TRIGGER obs_update BEFORE INSERT ON sampledb.joke " //
+//		        + "FOR EACH ROW "//
+//		        + "BEGIN "//
+//		        + "IF joke.jokeID = 1 THEN "//
+//		        + "   DELETE FROM joke WHERE jokeID = 1; "//
+//		        + "END IF; "//
+//		        + "END");
 		
 //		String sqlStatement = "";
 //		int resultSet = 0;
@@ -566,7 +566,6 @@ public class JokeDAO extends HttpServlet{
 		System.out.println("Trigger joke_review_before_update is created");
 		*/
 		statement.close();
-//		statementQuery.close();
 		resultSetQuery.close();
 		disconnect();
 		

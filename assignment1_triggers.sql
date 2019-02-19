@@ -49,25 +49,25 @@ END;
 -- -- user_favorite_before_update
 -- -- drop trigger user_favorite_before_insert;
 -- -- drop trigger `user_favorite_before_update`;
- CREATE TRIGGER `user_favorite_before_insert` BEFORE INSERT ON `user_favorite`
- 	FOR EACH ROW
- 	BEGIN
-	 	    IF new.type not in ('friend', 'joke') THEN
-        SIGNAL SQLSTATE '45020'
-           SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
-    END IF;
---     CALL sp_check_type_user_favorite(new.type) 
- END;   
- -- before update
- CREATE TRIGGER `user_favorite_before_update` BEFORE UPDATE ON `user_favorite`
- 	FOR EACH ROW
- 	BEGIN
-	 	    IF new.type not in ('friend', 'joke') THEN
-        SIGNAL SQLSTATE '45020'
-           SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
-    END IF;
---     CALL sp_check_type_user_favorite(new.type) 
- END;   
+-- CREATE TRIGGER `user_favorite_before_insert` BEFORE INSERT ON `user_favorite`
+-- 	FOR EACH ROW
+-- 	BEGIN
+--	 	    IF new.type not in ('friend', 'joke') THEN
+--        SIGNAL SQLSTATE '45020'
+--           SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
+--    END IF;
+----     CALL sp_check_type_user_favorite(new.type) 
+-- END;   
+-- -- before update
+-- CREATE TRIGGER `user_favorite_before_update` BEFORE UPDATE ON `user_favorite`
+-- 	FOR EACH ROW
+-- 	BEGIN
+--	 	    IF new.type not in ('friend', 'joke') THEN
+--        SIGNAL SQLSTATE '45020'
+--           SET MESSAGE_TEXT = 'check constraint on user_favorite.type failed. Type should be either (friend, joke) ';
+--    END IF;
+----     CALL sp_check_type_user_favorite(new.type) 
+-- END;   
 
 
 -- -- drop trigger joke_review_before_insert;

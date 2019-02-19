@@ -12,7 +12,8 @@ lastName varchar(50) not null,
 email varchar(100) not null,
 gender varchar(20),
 age int,
-isRoot int default 0,
+isRoot bool default 0,
+isBlacklist bool default 0,
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
 primary key (userID),
@@ -22,7 +23,7 @@ unique user_email_unique (email)
 
 create table joke (
 jokeID int not null auto_increment,
-userID int,
+userID int not null,
 title varchar(100) not null,
 description text,
 createdDate datetime default current_timestamp(),
@@ -33,8 +34,6 @@ FOREIGN KEY FK_joke_userID (userID) REFERENCES user(userID)
         ON UPDATE CASCADE
 -- , check( 5 >= (select count(1) from joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1))
 ) auto_increment = 1;
-
-
 
 create table joke_tag(
 jokeID int not null,
@@ -49,17 +48,32 @@ check (tag not like '% %'),
 check (binary tag = binary lower(tag))
 );
 
-create table user_favorite(
+create table user_favorite_friend(
 userID int not null,
-type varchar(20),
-favorite int,
+friendID int not null,
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
-primary key (userID, type, favorite),
+primary key (userID, friendID),
 FOREIGN KEY (userID) REFERENCES user(userID)
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
-check (type in ('friend', 'joke'))
+FOREIGN KEY (friendID) REFERENCES user(userID)
+		ON DELETE NO ACTION  
+        ON UPDATE CASCADE
+);
+
+create table user_favorite_joke(
+userID int not null,
+jokeID int not null,
+createdDate datetime default current_timestamp(),
+updatedDate datetime default current_timestamp(),
+primary key (userID, jokeID),
+FOREIGN KEY (userID) REFERENCES user(userID)
+		ON DELETE NO ACTION  
+        ON UPDATE CASCADE,
+FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
+		ON DELETE NO ACTION  
+        ON UPDATE CASCADE
 );
 
 create table joke_review(
@@ -83,28 +97,33 @@ FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
 -- ,check(5 >= (select count(1) from joke_review where date(createdDate) = date(current_timestamp()) and reviewUsername =  substring_index(user(), '@', 1) group by reviewUsername) = 5)
 );
 
-create table blacklist(
-userID varchar(20) not null,
-createdDate datetime default current_timestamp(),
-PRIMARY key (userID)
-);
+-- create table blacklist(
+-- userID varchar(20),
+-- createdDate datetime default current_timestamp(),
+-- Primary key (userID)
+-- -- FOREIGN KEY (userID) REFERENCES user(userID) 
+-- -- 		ON DELETE NO ACTION  
+-- --         ON UPDATE CASCADE
+-- );
+
 
 insert into user(
-userName, password, firstName, lastName, email, isRoot
+userName, password, firstName, lastName, email, isRoot, gender, age, isBlacklist
 )
 values
-('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com', 1)
-,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com', 0)
-,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com', 0)
-,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com', 0)
-,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com', 0)
-,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com', 0)
-,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com', 0)
-,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com', 0)
-,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com', 0)
-,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com', 0)
-,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com', 0)
+('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com', 1, 'F', 30, 0)
+,('john', 'pass1234', 'root', 'man2', 'man@hotmail.com', 0, 'M', 20, 0)
+,('root1', 'pass1234', 'john1', 'man', 'root1@hotmail.com', 0, 'F', 35, 1)
+,('john1', 'pass1234', 'root1', 'man2', 'man1@hotmail.com', 0, 'M', 30, 1)
+,('root2', 'pass1234', 'john2', 'man', 'root2@hotmail.com', 0, 'F', 30, 0)
+,('john2', 'pass1234', 'root2', 'man2', 'man2@hotmail.com', 0, 'M', 30, 0)
+,('root3', 'pass1234', 'john3', 'man3', 'root3@hotmail.com', 0, 'F', 30, 0)
+,('john3', 'pass1234', 'root3', 'man3', 'man3@hotmail.com', 0, 'M', 30, 0)
+,('root4', 'pass1234', 'john4', 'man', 'root4@hotmail.com', 0, 'F', 30, 0)
+,('john4', 'pass1234', 'root4', 'man2', 'man4@hotmail.com', 0, 'M', 30, 0)
+,('vzhang', 'victor1234', 'vzhang', 'man', 'vzhang@hotmail.com', 0, 'M', 40, 0)
 ;
+
 
 insert into joke (
 userID, title, description
@@ -130,18 +149,19 @@ jokeID,
 tag
 )
 values
-(1, 'XYY'),
-(1, 'X'),
-(1, 'Y'),
-(2, 'X'),
-(2, 'Y'),
-(3, 'X'),
-(3, 'Y'),
-(3, 'XYYY'),
-(3, 'YXY'),
+(1, 'xyy'),
+(1, 'x'),
+(1, 'y'),
+(2, 'x'),
+(2, 'y'),
+(3, 'x'),
+(3, 'y'),
+(3, 'xyyy'),
+(3, 'yxy'),
 (4, 'story'),
 (4, 'kids')
 ;
+
 
 insert into sampledb.joke_review(
 reviewerID,
@@ -163,29 +183,46 @@ values
 ,(2, 'john', 2, 'good', 'XXX')
 ;
 
-INSERT INTO `sampledb`.`user_favorite`
-(`userID`,
-`type`,
-`favorite`)
+
+INSERT INTO user_favorite_joke
+(userID,
+jokeID)
 VALUES
-(11, 'friend', 2)
-,(11, 'friend', 3)
-,(11, 'friend', 4)
-,(11, 'friend', 5)
-,(11, 'friend', 6)
-,(11, 'joke', 4)
-,(11, 'joke', 5)
-,(11, 'joke', 6)
-,(11, 'joke', 7)
-,(11, 'joke', 8)
+(11, 4)
+,(11, 5)
+,(11, 6)
+,(11, 7)
+,(11, 8)
+,(2, 4)
+,(2, 5)
+,(2, 6)
+,(2, 7)
+,(2, 8)
 ;
 
-INSERT INTO `sampledb`.`blacklist`
-(`userID`)
+INSERT INTO user_favorite_friend
+(userID,
+friendID)
 VALUES
-(3)
-,(4)
+(11, 4)
+,(11, 5)
+,(11, 6)
+,(11, 7)
+,(11, 8)
+,(2, 4)
+,(2, 5)
+,(2, 6)
+,(2, 7)
+,(2, 8)
 ;
+
+
+-- INSERT INTO blacklist
+-- (userID)
+-- VALUES
+-- (3)
+-- ,(4)
+-- ;
 
 -- update sampledb.joke_review set score = 'fair' where reviewerID = 2 and jokeID = 7;
 

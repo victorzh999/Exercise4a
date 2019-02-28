@@ -4,7 +4,8 @@
  	CREATE TRIGGER `joke_before_insert` BEFORE INSERT ON `joke`
  	FOR EACH ROW
  	BEGIN
-     IF (select count(1) from joke where date(createddate) =  date(current_timestamp()) group by userID order by 1 desc limit 1) = 5 THEN
+     IF (select count(1) from joke where date(createddate) =  date(current_timestamp()) 
+     and userID = new.userID) = 5 THEN
          SIGNAL SQLSTATE '45002'
             SET MESSAGE_TEXT = 'check constraint on joke posts per day failed';
      END IF;
@@ -80,12 +81,12 @@ END;
            SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
     END IF;
     
-    IF (select user.username from joke join user on user.userID = joke.userID where joke.jokeID = jokeID) =  substring_index(user(), '@', 1) THEN
+    IF (select userID from joke where jokeID = new.jokeID) =  new.reviewerID THEN
 		SIGNAL SQLSTATE '45001'
-			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed. Cannot post review on your own joke';
+			SET MESSAGE_TEXT = 'check constraint on joke_review.userID failed. Cannot post review on your own joke';
     END IF;
     
-    IF (select count(1) from sampledb.joke_review where date(createdDate) = date(current_timestamp()) and reviewUsername =  substring_index(user(), '@', 1) group by reviewUsername) = 5 THEN
+    IF (select count(1) from sampledb.joke_review where date(createdDate) = date(current_timestamp()) and reviewerID =  new.reviewerID ) = 5 THEN
         SIGNAL SQLSTATE '45030'
            SET MESSAGE_TEXT = 'check constraint on review posts per day failed';
     END IF;
@@ -101,9 +102,9 @@ END;
            SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
     END IF;
     
-    IF new.reviewUsername <>  substring_index(user(), '@', 1) THEN
+    IF (old.jokeID = new.jokeID) and (old.reviewerID <>  new.reviewerID) THEN
 		SIGNAL SQLSTATE '45001'
-			SET MESSAGE_TEXT = 'check constraint on joke_review.username failed. Cannot modify other user review';
+			SET MESSAGE_TEXT = 'check constraint on joke_review.userID failed. Cannot modify other user review';
     END IF;
 --     CALL sp_before_update_joke_review(new.score, new.reviewUsername) 
  END; 

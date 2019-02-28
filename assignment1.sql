@@ -3,9 +3,8 @@ drop database if exists sampledb;
 create database if not exists sampledb;
 use sampledb;
 
-create table user(
-userID int not null auto_increment,
-userName varchar(20) not null,
+create table user (
+userID varchar(20) not null,
 password varchar(50) not null,
 firstName varchar(50) not null,
 lastName varchar(50) not null,
@@ -17,13 +16,12 @@ isBlacklist bool default 0,
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
 primary key (userID),
-unique user_userName_unique (userName),
 unique user_email_unique (email)
-) auto_increment = 1;
+);
 
 create table joke (
 jokeID int not null auto_increment,
-userID int not null,
+userID varchar(20) not null,
 title varchar(100) not null,
 description text,
 createdDate datetime default current_timestamp(),
@@ -49,8 +47,8 @@ check (binary tag = binary lower(tag))
 );
 
 create table user_favorite_friend(
-userID int not null,
-friendID int not null,
+userID varchar(20) not null,
+friendID varchar(20) not null,
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
 primary key (userID, friendID),
@@ -63,7 +61,7 @@ FOREIGN KEY (friendID) REFERENCES user(userID)
 );
 
 create table user_favorite_joke(
-userID int not null,
+userID varchar(20) not null,
 jokeID int not null,
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
@@ -77,17 +75,13 @@ FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
 );
 
 create table joke_review(
-reviewerID int not null,
+reviewerID varchar(20) not null,
 jokeID int not null,
-reviewUsername varchar(20) not null,
 score varchar(10) not null check(score in ('excellent', 'good', 'fair', 'poor')),
 remark varchar(1000),
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
 primary key (reviewerID, jokeID),
-FOREIGN KEY (reviewUsername) REFERENCES user(username) 
-		ON DELETE NO ACTION  
-        ON UPDATE CASCADE,
 FOREIGN KEY (reviewerID) REFERENCES user(userID) 
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
@@ -108,7 +102,7 @@ FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
 
 
 insert into user(
-userName, password, firstName, lastName, email, isRoot, gender, age, isBlacklist
+userID, password, firstName, lastName, email, isRoot, gender, age, isBlacklist
 )
 values
 ('root', 'pass1234', 'vzhang', 'man', 'root@hotmail.com', 1, 'F', 30, 0)
@@ -129,19 +123,19 @@ insert into joke (
 userID, title, description
 )
 values
-(11, 'joke_vzhang', 'this is a normal joke')
-,(3, 'joke1', 'this is a fancy joke')
-,(3, 'joke2', 'this is a very intereasting joke i heard')
-,(4, 'joke3', 'this is a boring joke i heard')
-,(3, 'joke4', 'this is a very intereasting joke i heard')
-,(4, 'joke5', 'this is a boring joke i heard')
-,(2, 'joke6', 'this is a very intereasting joke i heard')
-,(2, 'joke7', 'this is a boring joke i heard')
-,(2, 'joke8', 'this is a very intereasting joke i heard')
-,(5, 'joke9', 'this is a boring joke i heard')
-,(6, 'joke210', 'this is a very intereasting joke i heard')
-,(3, 'joke11', 'this is a fancy joke')
-,(3, 'joke12', 'this is a very intereasting joke i heard')
+('vzhang', 'joke_vzhang', 'this is a normal joke')
+,('john', 'joke1', 'this is a fancy joke')
+,('john', 'joke2', 'this is a very intereasting joke i heard')
+,('root2', 'joke3', 'this is a boring joke i heard')
+,('john1', 'joke4', 'this is a very intereasting joke i heard')
+,('root2', 'joke5', 'this is a boring joke i heard')
+,('root1', 'joke6', 'this is a very intereasting joke i heard')
+,('root1', 'joke7', 'this is a boring joke i heard')
+,('root1', 'joke8', 'this is a very intereasting joke i heard')
+,('john2', 'joke9', 'this is a boring joke i heard')
+,('john2', 'joke210', 'this is a very intereasting joke i heard')
+,('john1', 'joke11', 'this is a fancy joke')
+,('john1', 'joke12', 'this is a very intereasting joke i heard')
 ;
 
 insert into joke_tag(
@@ -165,22 +159,21 @@ values
 
 insert into sampledb.joke_review(
 reviewerID,
-reviewUsername,
 jokeid,
 score,
 remark
 )
 values
-(2, 'john', 7, 'good', 'XXX')
-,(2, 'john', 3, 'good', 'XXX')
-,(2, 'john', 4, 'good', 'XXX')
-,(2, 'john', 5, 'good', 'XXX')
-,(11, 'vzhang', 2, 'good', 'XXX')
-,(11, 'vzhang', 3, 'good', 'XXX')
-,(11, 'vzhang', 4, 'good', 'XXX')
-,(11, 'vzhang', 5, 'good', 'XXX')
-,(11, 'vzhang', 6, 'good', 'XXX')
-,(2, 'john', 2, 'good', 'XXX')
+('john', 7, 'good', 'XXX')
+,('john', 3, 'good', 'XXX')
+,('john', 4, 'good', 'XXX')
+,('john', 5, 'good', 'XXX')
+,('vzhang', 2, 'good', 'XXX')
+,('vzhang', 3, 'good', 'XXX')
+,('vzhang', 4, 'good', 'XXX')
+,('vzhang', 5, 'good', 'XXX')
+,('vzhang', 6, 'good', 'XXX')
+,('john', 2, 'good', 'XXX')
 ;
 
 
@@ -188,40 +181,46 @@ INSERT INTO user_favorite_joke
 (userID,
 jokeID)
 VALUES
-(11, 4)
-,(11, 5)
-,(11, 6)
-,(11, 7)
-,(11, 8)
-,(2, 4)
-,(2, 5)
-,(2, 6)
-,(2, 7)
-,(2, 8)
+('vzhang', 4)
+,('vzhang', 5)
+,('vzhang', 6)
+,('vzhang', 7)
+,('vzhang', 8)
+,('john', 4)
+,('john', 5)
+,('john', 6)
+,('john', 7)
+,('john', 8)
 ;
 
-INSERT INTO user_favorite_friend
-(userID,
-friendID)
-VALUES
-(11, 4)
-,(11, 5)
-,(11, 6)
-,(11, 7)
-,(11, 8)
-,(2, 4)
-,(2, 5)
-,(2, 6)
-,(2, 7)
-,(2, 8)
-;
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('vzhang', 'john');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('vzhang', 'john1');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('vzhang', 'john2');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('vzhang', 'root2');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('vzhang', 'root3');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('john', 'root2');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('john', 'john2');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('john', 'john3');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('john', 'root3');
+-- INSERT INTO user_favorite_friend(userID, friendID) VALUES('john', 'vzhang');
 
+INSERT INTO user_favorite_friend(userID, friendID) VALUES
+('vzhang', 'john')
+,('vzhang', 'john1')
+,('vzhang', 'john2')
+,('vzhang', 'root2')
+,('vzhang', 'root3')
+,('john', 'root2')
+,('john', 'john2')
+,('john', 'john3')
+,('john', 'root3')
+,('john', 'vzhang');
 
 -- INSERT INTO blacklist
 -- (userID)
 -- VALUES
--- (3)
--- ,(4)
+-- ('john2')
+-- ,('john3')
 -- ;
 
 -- update sampledb.joke_review set score = 'fair' where reviewerID = 2 and jokeID = 7;

@@ -20,7 +20,7 @@
         
         Class.forName("com.mysql.jdbc.Driver");  // MySQL database connection
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/sampledb?" + "user=vzhang&password=victor1234");    
-        PreparedStatement pst = conn.prepareStatement("Select username,password from user where username=? and password=?");
+        PreparedStatement pst = conn.prepareStatement("Select userID,password from user where userID=? and password=?");
         pst.setString(1, username);
         pst.setString(2, password);
         ResultSet rs = pst.executeQuery();                        

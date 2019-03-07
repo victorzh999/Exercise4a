@@ -27,6 +27,7 @@ description text,
 createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
 primary key (jokeID),
+unique joke_title_unique (title),
 FOREIGN KEY FK_joke_userID (userID) REFERENCES user(userID)
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE
@@ -40,7 +41,7 @@ createdDate datetime default current_timestamp(),
 updatedDate datetime default current_timestamp(),
 primary key (jokeID, tag),
 FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
-		ON DELETE NO ACTION  
+		ON DELETE CASCADE  
         ON UPDATE CASCADE,
 check (tag not like '% %'),
 check (binary tag = binary lower(tag))
@@ -70,7 +71,7 @@ FOREIGN KEY (userID) REFERENCES user(userID)
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
 FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
-		ON DELETE NO ACTION  
+		ON DELETE CASCADE  
         ON UPDATE CASCADE
 );
 
@@ -86,7 +87,7 @@ FOREIGN KEY (reviewerID) REFERENCES user(userID)
 		ON DELETE NO ACTION  
         ON UPDATE CASCADE,
 FOREIGN KEY (jokeID) REFERENCES joke(jokeID)
-		ON DELETE NO ACTION  
+		ON DELETE CASCADE 
         ON UPDATE CASCADE
 -- ,check(5 >= (select count(1) from joke_review where date(createdDate) = date(current_timestamp()) and reviewUsername =  substring_index(user(), '@', 1) group by reviewUsername) = 5)
 );

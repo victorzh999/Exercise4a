@@ -11,7 +11,7 @@
 	<display-name>CSC6710 Exercise 4</display-name>
 	<context-param>
 		<param-name>jdbcURL</param-name>
-		<param-value>jdbc:mysql://localhost/test</param-value>
+		<param-value>jdbc:mysql://localhost/sampledb</param-value>
 	</context-param>
 
 	<context-param>

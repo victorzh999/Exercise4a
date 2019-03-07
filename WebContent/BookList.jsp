@@ -7,37 +7,43 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Books Store Application</title>
+<title>Joke Website Application</title>
 </head>
 <body>
-	<center>
-		<h1>Books Management</h1>
-		<h2>
-			<a href="new">Add New Book</a> &nbsp;&nbsp;&nbsp; <a href="list">List
-				All Books</a>
-		</h2>
-	</center>
+	
+		<h1>Joke Management</h1>
+		<h3>
+			<a href="insertJoke">Post a Joke</a>  &nbsp;&nbsp;&nbsp; 
+		</h3>
+		<h3>	
+			<a href="listJoke">List All Jokes</a>
+		</h3>
+	
 	<div align="center">
 		<table border="1" cellpadding="5">
 			<caption>
-				<h2>List of All Books</h2>
+				<h2>List of All Jokes</h2>
 			</caption>
 			<tr>
-				<th>ID</th>
+				<th>JokeID</th>
+				<th>UserID</th>
 				<th>Title</th>
-				<th>Author</th>
-				<th>Price</th>
+				<th>Description</th>
+				<th>CreatedDate</th>
 			</tr>
 
-			<c:forEach var="book" items="${listBook}">
+			<c:forEach var="joke" items="${listJoke}">
 				<tr>
-					<td><c:out value="${book.id}" /></td>
-					<td><c:out value="${book.title}" /></td>
-					<td><c:out value="${book.author}" /></td>
-					<td><c:out value="${book.price}" /></td>
-					<td><a href="edit?id=<c:out value='${book.id}' />">Edit</a>
+					<td><c:out value="${joke.jokeID}" /></td>
+					<td><c:out value="${joke.userID}" /></td>
+					<td><c:out value="${joke.title}" /></td>
+					<td><c:out value="${joke.description}" /></td>
+					<td><c:out value="${joke.createdDate}" /></td>
+					
+					<td><a href="edit?jokeID=<c:out value='${joke.jokeID}' />">Edit</a>
 						&nbsp;&nbsp;&nbsp;&nbsp; <a
-						href="delete?id=<c:out value='${book.id}' />">Delete</a></td>
+						href="delete?jokeID=<c:out value='${joke.jokeID}' />">Delete</a>
+					</td>
 				</tr>
 			</c:forEach>
 		</table>

@@ -18,15 +18,14 @@
         sess.setAttribute("username", username);
         sess.setAttribute("password", password);
         
-        Class.forName("com.mysql.jdbc.Driver");  // MySQL database connection
+        Class.forName("com.mysql.cj.jdbc.Driver");  // MySQL database connection
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/sampledb?" + "user=vzhang&password=victor1234");    
-        PreparedStatement pst = conn.prepareStatement("Select userID,password from user where userID=? and password=?");
+        PreparedStatement pst = conn.prepareStatement("Select userID, password from user where userID=? and password=?");
         pst.setString(1, username);
         pst.setString(2, password);
         ResultSet rs = pst.executeQuery();                        
         if(rs.next()) {           
             out.println("Valid login credentials"); 
-//             request.setAttribute("username", username);
             request.getRequestDispatcher("JokeHomePage.jsp").forward(request, response);
 //          request.setAttribute("listBook", listBook);       
 //          RequestDispatcher dispatcher = request.getRequestDispatcher("JokeHomePage.jsp");       

@@ -319,23 +319,24 @@ public class ControllServlet extends HttpServlet {
 //    	HttpSession sess = request.getSession(false); //use false to use the existing session
 //    	String userName = (String) sess.getAttribute("username");
     	
-    	if (userName.equals("john")) {
-        	System.out.println("userName john called");
-//        	jokeDAO.initializeDB();
-        	RequestDispatcher dispatcher = request.getRequestDispatcher("JokeList.jsp");
-        	dispatcher.forward(request, response);
-    	}
-    	else if (userName.equals("root")) {
+    	if (userName.equals("root")) {
         	System.out.println("userName root called");
         	jokeDAO.initializeDB();
+    	}
         	RequestDispatcher dispatcher = request.getRequestDispatcher("JokeList.jsp");
         	dispatcher.forward(request, response);
-    	}
-    	else {
-        	System.out.println("Error page is called");
-    		RequestDispatcher dispatcher = request.getRequestDispatcher("Error.jsp");
-        	dispatcher.forward(request, response);
-    	}
+//    	}
+//    	else {
+//        	System.out.println("no root user called");
+//        	jokeDAO.initializeDB();
+//        	RequestDispatcher dispatcher = request.getRequestDispatcher("JokeList.jsp");
+//        	dispatcher.forward(request, response);
+//    	}
+//    	else {
+//        	System.out.println("Error page is called");
+//    		RequestDispatcher dispatcher = request.getRequestDispatcher("Error.jsp");
+//        	dispatcher.forward(request, response);
+//    	}
     }
 
 	private void listJoke(HttpServletRequest request, HttpServletResponse response)

@@ -7,7 +7,7 @@
      IF (select count(1) from joke where date(createddate) =  date(current_timestamp()) 
      and userID = new.userID) = 5 THEN
          SIGNAL SQLSTATE '45002'
-            SET MESSAGE_TEXT = 'check constraint on joke posts per day failed';
+            SET MESSAGE_TEXT = 'Warning! You already post 5 jokes today! Come back tomorrow.';
      END IF;
  	END;
 -- 	
@@ -19,12 +19,12 @@
  		BEGIN
     IF new.tag like '% %' THEN
         SIGNAL SQLSTATE '45010'
-           SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on single word. Tag should be single word.';
+           SET MESSAGE_TEXT = 'Warning! Tag should be single word.';
     END IF;
     
 	IF binary new.tag <> binary lower(new.tag) THEN
         SIGNAL SQLSTATE '45011'
-           SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on lower case. Tag should be lower cases.';
+           SET MESSAGE_TEXT = 'Warning! Tag should be lower cases.';
     END IF;
 END;
 
@@ -35,12 +35,12 @@ END;
  	 		BEGIN
     IF new.tag like '% %' THEN
         SIGNAL SQLSTATE '45010'
-           SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on single word. Tag should be single word.';
+           SET MESSAGE_TEXT = 'Warning! Tag should be single word.';
     END IF;
     
 	IF binary new.tag <> binary lower(new.tag) THEN
         SIGNAL SQLSTATE '45011'
-           SET MESSAGE_TEXT = 'check constraint on joke_tag.tag failed on lower case. Tag should be lower cases.';
+           SET MESSAGE_TEXT = 'Warning! Tag should be lower cases.';
     END IF;
 END;
  
@@ -78,17 +78,17 @@ END;
  	BEGIN
 	 	    IF new.score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
-           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
+           SET MESSAGE_TEXT = 'Warning! Score should be either (excellent, good, fair or poor).';
     END IF;
     
     IF (select userID from joke where jokeID = new.jokeID) =  new.reviewerID THEN
 		SIGNAL SQLSTATE '45001'
-			SET MESSAGE_TEXT = 'check constraint on joke_review.userID failed. Cannot post review on your own joke';
+			SET MESSAGE_TEXT = 'Warning! Cannot post review on your own joke';
     END IF;
     
     IF (select count(1) from sampledb.joke_review where date(createdDate) = date(current_timestamp()) and reviewerID =  new.reviewerID ) = 5 THEN
         SIGNAL SQLSTATE '45030'
-           SET MESSAGE_TEXT = 'check constraint on review posts per day failed';
+           SET MESSAGE_TEXT = 'Warning! You already posted 5 reviews today. Come back tomorrow!';
     END IF;
 --     CALL sp_before_insert_joke_review(new.score, new.jokeID) 
  END;  
@@ -99,12 +99,12 @@ END;
  	BEGIN
 	 	    IF new.score not in ('excellent', 'good', 'fair', 'poor') THEN
         SIGNAL SQLSTATE '45000'
-           SET MESSAGE_TEXT = 'check constraint on joke_review.score failed. Score should be either (excellent, good, fair or poor).';
+           SET MESSAGE_TEXT = 'Warning! Score should be either (excellent, good, fair or poor).';
     END IF;
     
     IF (old.jokeID = new.jokeID) and (old.reviewerID <>  new.reviewerID) THEN
 		SIGNAL SQLSTATE '45001'
-			SET MESSAGE_TEXT = 'check constraint on joke_review.userID failed. Cannot modify other user review';
+			SET MESSAGE_TEXT = 'Warning! Cannot modify other user review';
     END IF;
 --     CALL sp_before_update_joke_review(new.score, new.reviewUsername) 
  END; 

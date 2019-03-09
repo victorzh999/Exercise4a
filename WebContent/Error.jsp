@@ -7,6 +7,22 @@
 <title>Error</title>
 </head>
 <body>
+		<h1>Joke Management</h1>
+		<h3>
+			<a href="newJoke">Post a Joke</a>  &nbsp;&nbsp;&nbsp; 
+		</h3>
+		<h3>	
+			<a href="listJoke">List Latest 20 Jokes</a>
+		</h3>
+		<h3>	
+			<a href="listFavoriteFriend">List All Favorite Friends</a>
+		</h3>
+		<h3>	
+			<a href="listFavoriteJoke">List All Favorite Jokes</a>
+		</h3>
+		<h3>	
+			<a href="searchJokeByTagForm">Search Jokes By Tag</a>
+		</h3>
 	<center>
 		<h1>Error</h1>
 		<h2><%=exception.getMessage()%><br />

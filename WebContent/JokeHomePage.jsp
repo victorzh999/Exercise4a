@@ -12,6 +12,9 @@
 <body>
 	<center>
 		<h1>Joke Management</h1>
+		
+
+		
 		<h2>
 			<a href="initializeDB">Initialize Database</a> 
 		</h2>

@@ -320,8 +320,14 @@ public class ControllServlet extends HttpServlet {
 //    	String userName = (String) sess.getAttribute("username");
     	
     	if (userName.equals("john")) {
-        	System.out.println("userName root called");
+        	System.out.println("userName john called");
 //        	jokeDAO.initializeDB();
+        	RequestDispatcher dispatcher = request.getRequestDispatcher("JokeList.jsp");
+        	dispatcher.forward(request, response);
+    	}
+    	else if (userName.equals("root")) {
+        	System.out.println("userName root called");
+        	jokeDAO.initializeDB();
         	RequestDispatcher dispatcher = request.getRequestDispatcher("JokeList.jsp");
         	dispatcher.forward(request, response);
     	}

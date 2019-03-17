@@ -25,7 +25,14 @@
 		</h3>
 	<center>
 		<h1>Error</h1>
-		<h2><%=exception.getMessage()%><br />
+		
+		<h2><%
+		    try {
+		    	out.println(exception.getMessage());
+		    } catch (NullPointerException e) {
+		        out.println("<p>Exception catched " + e.getMessage() + "</p>");
+		    }
+			%> <br />
 		</h2>
 	</center>
 </body>
